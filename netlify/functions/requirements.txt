@@ -1,3 +1,0 @@
-# netlify/functions/requirements.txt
-sentence-transformers==3.0.1
-torch==2.3.1 --index-url https://download.pytorch.org/rl/cpu
