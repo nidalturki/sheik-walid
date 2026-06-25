@@ -17,16 +17,16 @@ exports.handler = async (event, context) => {
       };
     }
 
-    # Importación dinámica de la librería de Transformers de Hugging Face
+    // Importación dinámica de la librería de Transformers de Hugging Face
     const { pipeline } = await import('@xenova/transformers');
 
-    # Inicializamos el extractor de características (Feature Extraction) con el mismo modelo ligero
+    // Inicializamos el extractor de características con el modelo ligero
     const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
-    # Generamos el embedding (vectorización)
+    // Generamos la vectorización (embedding)
     const output = await extractor(texto, { pooling: 'mean', normalize: true });
     
-    # Convertimos el resultado a un array común de JavaScript
+    // Convertimos el resultado a un array común de JavaScript
     const embedding = Array.from(output.data);
 
     return {
