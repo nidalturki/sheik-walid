@@ -1,6 +1,2 @@
 [build]
   functions = "netlify/functions"
-
-[functions]
-  # Esto le dice a Netlify explícitamente que instale y configure el entorno de Python
-  included_files = ["netlify/functions/**"]
