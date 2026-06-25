@@ -1,7 +1,3 @@
-const https = require('https');
-
-const API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2";
-
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
     return {
@@ -21,34 +17,17 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Promesa para manejar la petición HTTPS nativa de Node.js sin usar 'fetch'
-    const queryHuggingFace = (data) => {
-      return new Promise((resolve, reject) => {
-        const options = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'NetlifyFunction-Vectorizar'
-          },
-          timeout: 30000 // 30 segundos de margen
-        };
+    # Importación dinámica de la librería de Transformers de Hugging Face
+    const { pipeline } = await import('@xenova/transformers');
 
-        const req = https.request(API_URL, options, (res) => {
-          let responseData = '';
-          res.on('data', (chunk) => { responseData += chunk; });
-          res.on('end', () => { resolve(JSON.parse(responseData)); });
-        });
+    # Inicializamos el extractor de características (Feature Extraction) con el mismo modelo ligero
+    const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
-        req.on('error', (err) => { reject(err); });
-        req.on('timeout', () => { req.destroy(); reject(new Error('Tiempo de espera agotado con Hugging Face')); });
-        
-        req.write(JSON.stringify({ inputs: data }));
-        req.end();
-      });
-    };
-
-    // Ejecutar la petición
-    const embedding = await queryHuggingFace(texto);
+    # Generamos el embedding (vectorización)
+    const output = await extractor(texto, { pooling: 'mean', normalize: true });
+    
+    # Convertimos el resultado a un array común de JavaScript
+    const embedding = Array.from(output.data);
 
     return {
       statusCode: 200,
@@ -58,7 +37,7 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify({
         texto_original: texto,
-        dimensiones: Array.isArray(embedding) ? embedding.length : null,
+        dimensiones: embedding.length,
         vector: embedding,
       }),
     };
