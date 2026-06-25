@@ -2,11 +2,5 @@
   functions = "netlify/functions"
 
 [functions]
-  # Forzamos a Netlify a usar el entorno de Python
-  node_bundler = "esbuild"
-
-# Opcional pero recomendado: si quieres que responda en /api/vectorizar en vez de la ruta larga
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+  # Esto le dice a Netlify explícitamente que instale y configure el entorno de Python
+  included_files = ["netlify/functions/**"]
